@@ -1,91 +1,91 @@
-
-//
-// Disclaimer:
-// ----------
-//
-// This code will work only if you selected window, graphics and audio.
-//
-// Note that the "Run Script" build phase will copy the required frameworks
-// or dylibs to your application bundle so you can execute it on any OS X
-// computer.
-//
-// Your resource files (images, sounds, fonts, ...) are also copied to your
-// application bundle. To get the path to these resources, use the helper
-// function `resourcePath()` from ResourcePath.hpp
-//
-
-#include <SFML/Audio.hpp>
 #include <SFML/Graphics.hpp>
+#include <cmath>
 
 // Here is a small helper for you! Have a look.
 #include "ResourcePath.hpp"
+#include "Cell.hpp"
+#include "Grid.hpp"
+#include "Organism.hpp"
+#include <iostream>
+#include <vector>
+using std::vector;
+
+vector<vector<int> > pictureToVector(std::string image_path);
+
 
 int main(int, char const**)
 {
-    // Create the main window
-    sf::RenderWindow window(sf::VideoMode(800, 600), "SFML window");
-
-    // Set the Icon
-    sf::Image icon;
-    if (!icon.loadFromFile(resourcePath() + "icon.png")) {
-        return EXIT_FAILURE;
+    //Test Vector with values
+    vector<vector<int> > test;
+    
+    for (int i = 0; i < 60; i++){
+        test.push_back(vector<int> (80, 0));
     }
-    window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
+    
+    test[0][0] = 0;
+    test[0][1] = 0;
+    test[0][2] = 1;
+    test[0][3] = 0;
+    //--
+    test[1][0] = 1;
+    test[1][1] = 0;
+    test[1][2] = 1;
+    test[1][3] = 0;
+    //--
+    test[2][0] = 0;
+    test[2][1] = 1;
+    test[2][2] = 1;
+    test[2][3] = 0;
+    //--
 
-    // Load a sprite to display
-    sf::Texture texture;
-    if (!texture.loadFromFile(resourcePath() + "cute_image.jpg")) {
-        return EXIT_FAILURE;
-    }
-    sf::Sprite sprite(texture);
-
-    // Create a graphical text to display
-    sf::Font font;
-    if (!font.loadFromFile(resourcePath() + "sansation.ttf")) {
-        return EXIT_FAILURE;
-    }
-    sf::Text text("Hello SFML", font, 50);
-    text.setFillColor(sf::Color::Black);
-
-    // Load a music to play
-    sf::Music music;
-    if (!music.openFromFile(resourcePath() + "nice_music.ogg")) {
-        return EXIT_FAILURE;
-    }
-
-    // Play the music
-    music.play();
-
-    // Start the game loop
-    while (window.isOpen())
-    {
-        // Process events
+    
+    //Window initialization and settings
+    sf::ContextSettings settings;
+    sf::RenderWindow window(sf::VideoMode(800, 600), "Game of Life", sf::Style::Default, settings);
+    sf::Clock clock;
+    const float FPS = 60;
+    
+    Cell cell;
+    Grid grid;
+    Organism organism(test);
+    
+    
+    //run program as long as window is open
+    while (window.isOpen()) {
         sf::Event event;
-        while (window.pollEvent(event))
-        {
-            // Close window: exit
+        
+        while (window.pollEvent(event)) {
+            //"close requested" event: we close the window
             if (event.type == sf::Event::Closed) {
                 window.close();
             }
-
-            // Escape pressed: exit
-            if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape) {
-                window.close();
-            }
         }
-
-        // Clear screen
-        window.clear();
-
-        // Draw the sprite
-        window.draw(sprite);
-
-        // Draw the string
-        window.draw(text);
-
-        // Update the window
+        
+        if (clock.getElapsedTime().asMilliseconds() > 1000) {
+            organism.update();
+            clock.restart();
+        }
+        
+        // clear the window with white color
+        window.clear(sf::Color::White);
+        
+        //Drawing to the screen
+        organism.draw(&window);
+        grid.draw(&window);
+        
+        //end the current frame
         window.display();
+        
     }
-
-    return EXIT_SUCCESS;
+    
+    return 0;
 }
+
+vector<vector<int> > pictureToVector(std::string image_path) {
+    sf::Image image;
+    if (!image.loadFromFile(resourcePath() + image_path)) {
+        throw EXIT_FAILURE;
+    }
+    
+}
+
