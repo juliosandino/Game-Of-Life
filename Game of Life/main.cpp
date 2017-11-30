@@ -61,7 +61,7 @@ int main(int, char const**)
             }
         }
         
-        if (clock.getElapsedTime().asMilliseconds() > 15) {
+        if (clock.getElapsedTime().asMilliseconds() > (1/FPS)) {
             organism.update();
             clock.restart();
         }
