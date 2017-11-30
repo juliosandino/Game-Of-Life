@@ -24,7 +24,7 @@ int main(int, char const**)
     
     test[0][0] = 0;
     test[0][1] = 0;
-    test[0][2] = 1;
+    test[0][43] = 1;
     test[0][3] = 0;
     //--
     test[1][0] = 1;
